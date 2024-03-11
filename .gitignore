@@ -1,2 +1,4 @@
 go.sum
 .null-ls*
+*_templ.go
+*.db
