@@ -1,8 +1,8 @@
 package routes
 
 import (
+  "github.com/adalrikus/go-templ/pkg/auth"
   "github.com/adalrikus/go-templ/pkg/controllers"
-  "github.com/adalrikus/go-templ/pkg/models"
   "github.com/adalrikus/go-templ/pkg/handlers"
 
   "github.com/labstack/echo/v4"
@@ -21,7 +21,7 @@ func InitRoutes(e *echo.Echo) {
   var profieGroup = e.Group("/profile")
   var config = echojwt.Config{
     NewClaimsFunc: func(c echo.Context) jwt.Claims {
-      return new(models.JWTCustomClaims)
+      return new(auth.JWTCustomClaims)
     },
     SigningKey: []byte("secret"),
   }

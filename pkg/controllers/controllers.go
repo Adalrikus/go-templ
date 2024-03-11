@@ -4,6 +4,7 @@ import (
   "net/http"
   "time"
 
+	"github.com/adalrikus/go-templ/pkg/auth"
 	"github.com/adalrikus/go-templ/pkg/models"
   "github.com/adalrikus/go-templ/pkg/views/profile"
 
@@ -23,7 +24,7 @@ func RegisterNewUser(c echo.Context) error {
     return err
   }
   
-  var claims = models.JWTCustomClaims{
+  var claims = auth.JWTCustomClaims{
     user.Username,
     user.FirstName,
     user.LastName,
@@ -33,15 +34,12 @@ func RegisterNewUser(c echo.Context) error {
     },
   }
 
-  var token, err = claims.Create()
+  var _, err = claims.Create()
   if err != nil {
     return err
   }
-
-  c.JSON(http.StatusOK, echo.Map{
-    "token": token,
-  })
   
+  c.Response().Writer.WriteHeader(http.StatusOK)
 	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
   return profile.Profile(claims).Render(c.Request().Context(), c.Response().Writer)
 }
@@ -55,7 +53,7 @@ func LoginUser(c echo.Context) error {
     return err
   }
   
-  var claims = models.JWTCustomClaims{
+  var claims = auth.JWTCustomClaims{
     user.Username,
     user.FirstName,
     user.LastName,
@@ -65,15 +63,12 @@ func LoginUser(c echo.Context) error {
     },
   }
 
-  var token, err = claims.Create()
+  var _, err = claims.Create()
   if err != nil {
     return err
   }
 
-  c.JSON(http.StatusOK, echo.Map{
-    "token": token,
-  })
-
+  c.Response().Writer.WriteHeader(http.StatusOK)
   c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
   return profile.Profile(claims).Render(c.Request().Context(), c.Response().Writer)
 }

@@ -1,10 +1,10 @@
 package profile
 
 import (
-  "github.com/adalrikus/go-templ/pkg/models"
+  "github.com/adalrikus/go-templ/pkg/auth"
 )
 
-templ Profile(user models.JWTCustomClaims) {
+templ Profile(user auth.JWTCustomClaims) {
   <div>
     <h1>Profile</h1>
     <p>First name: { user.FirstName }</p>
@@ -18,8 +18,8 @@ templ Login() {
     <h1>Login</h1>
     <form action="/login" method="POST">
       <div>
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email"></input>
+        <label for="username">Username</label>
+        <input type="username" name="username" id="username"></input>
       </div>
       <div>
         <label for="password">Password</label>
@@ -36,6 +36,10 @@ templ Register() {
   <div>
     <h1>Register</h1>
     <form action="/register" method="POST">
+      <div>
+        <label for="username">Username</label>
+        <input type="username" name="username" id="username"></input>
+      </div>
       <div>
         <label for="firstname">First Name</label>
         <input type="firstname" name="firstname" id="firstname"></input>
@@ -64,5 +68,6 @@ templ Index() {
     <a href="/profile">Profile</a>
     <a href="/logout">Logout</a>
     <a href="/login">Login</a>
+    <a href="/register">Register</a>
   </div>
 }

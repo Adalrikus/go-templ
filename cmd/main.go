@@ -1,7 +1,6 @@
 package main
 
 import (
-  "log"
   "net/http"
 
   "github.com/adalrikus/go-templ/pkg/models"
@@ -17,11 +16,11 @@ func main() {
 	e.Use(middleware.Recover())
 
   if err := models.InitDB("database.db"); err != nil {
-    log.Fatal(err)
+    e.Logger.Fatal(err)
   }
   routes.InitRoutes(e)
   if err := e.Start(":8080"); err != http.ErrServerClosed {
-    log.Fatal(err)
+    e.Logger.Fatal(err)
   }
 }
 

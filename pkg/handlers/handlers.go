@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/adalrikus/go-templ/pkg/models"
+	"github.com/adalrikus/go-templ/pkg/auth"
 	"github.com/adalrikus/go-templ/pkg/views/profile"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
@@ -21,6 +21,6 @@ func RegisterHandler(c echo.Context) error {
 
 func ProfileHandler(c echo.Context) error {
   var user = c.Get("user").(*jwt.Token)
-  var claims = user.Claims.(*models.JWTCustomClaims)
+  var claims = user.Claims.(*auth.JWTCustomClaims)
   return profile.Profile(*claims).Render(c.Request().Context(), c.Response().Writer)
 }
