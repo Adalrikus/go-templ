@@ -1,16 +1,30 @@
 package main
 
 import (
-  "github.com/adalrikus/go-templ/pkg/slick"
-  "github.com/adalrikus/go-templ/pkg/views/profile"
+  "log"
+  "net/http"
+
+  "github.com/adalrikus/go-templ/pkg/models"
+  "github.com/adalrikus/go-templ/pkg/routes"
+
+  "github.com/labstack/echo/v4"
+  "github.com/labstack/echo-jwt/v4"
+  "github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
-  s := slick.New()
-  s.Get("/profile", HandleUserProfile)
-  s.Start(":3000")
+  var e = echo.New()
+  e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	e.Use(echojwt.WithConfig(echojwt.Config{
+		SigningKey: []byte("secret"),
+	}))
+  
+  models.InitDB("database.db")
+  routes.InitRoutes(e)
+  if err := e.Start(":8080"); err != http.ErrServerClosed {
+    log.Fatal(err)
+  }
 }
 
-func HandleUserProfile(c *slick.Context) error {
-  return c.Render(profile.Index())
-}

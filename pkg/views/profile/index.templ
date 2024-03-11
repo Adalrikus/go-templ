@@ -1,7 +1,68 @@
 package profile
 
-templ Index() {
+import (
+  "github.com/adalrikus/go-templ/pkg/models"
+)
+
+templ Profile(user models.User) {
   <div>
     <h1>Profile</h1>
+    <p>First name: {{ user.FirstName }}</p>
+    <p>Last name: {{ user.LastName }}</p>
+    <p>Email: {{ user.Email }}</p>
+  </div>
+}
+
+templ Login() {
+  <div>
+    <h1>Login</h1>
+    <form action="/login" method="POST">
+      <div>
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email"></input>
+      </div>
+      <div>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password"></input>
+      </div>
+      <div>
+        <input type="submit" value="Login"></input>
+      </div>
+    </form>
+  </div>
+}
+
+templ Register() {
+  <div>
+    <h1>Login</h1>
+    <form action="/register" method="POST">
+      <div>
+        <label for="firstname">First Name</label>
+        <input type="firstname" name="firstname" id="firstname"></input>
+      </div>
+      <div>
+        <label for="lastname">Last Name</label>
+        <input type="lastname" name="lastname" id="lastname"></input>
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email"></input>
+      </div>
+      <div>
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password"></input>
+      </div>
+      <div>
+        <input type="submit" value="Register"></input>
+      </div>
+    </form>
+  </div>
+}
+
+templ Index() {
+  <div>
+    <a href="/profile">Profile</a>
+    <a href="/logout">Logout</a>
+    <a href="/login">Login</a>
   </div>
 }
