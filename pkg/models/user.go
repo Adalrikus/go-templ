@@ -1,9 +1,9 @@
 package models
 
 import (
-	"fmt"
-	"log"
+	"errors"
 
+  "github.com/golang-jwt/jwt/v5"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -18,30 +18,44 @@ type User struct {
   Email     string `gorm:"type:varchar(100)" json:"email"`
 }
 
-var db *gorm.DB
+type JWTCustomClaims struct {
+  Username  string `json:"username"`
+  FirstName string `json:"first_name"`
+  LastName  string `json:"last_name"`
+  Email     string `json:"email"`
+  jwt.RegisteredClaims
+}
 
-func InitDB(filename string) (*gorm.DB, error) {
+var DB *gorm.DB
+
+func InitDB(filename string) error {
   db, err := gorm.Open(sqlite.Open(filename), &gorm.Config{})
   if err != nil {
-    log.Fatal("failed to connect database")
-    return nil, err
+    return err
   }
-  db.AutoMigrate(&User{})
-  return db, nil
+  DB = db
+  DB.AutoMigrate(&User{})
+  return nil
 }
 
 func (u *User) CreateNewUser() error {
-  db.Create(u)
+  DB.Create(u)
   return u.Login()
 }
 
 func (u *User) Login() error {
   var result User
-  db.Where("Username = ?", u.Username).Where("Password = ?", u.Password).First(&result)
+  DB.Where("Username = ?", u.Username).Where("Password = ?", u.Password).First(&result)
   if result.Username != u.Username {
-    return fmt.Errorf("User not found!")
+    return errors.New("User not found!")
   } else if result.Password != u.Password {
-    return fmt.Errorf("Password incorrect!")
+    return errors.New("Password incorrect!")
   }
+  u = &result
   return nil
+}
+
+func (claims *JWTCustomClaims) Create() (string, error) {
+  var token = jwt.NewWithClaims(jwt.SigningMethodHS256, *claims)
+  return token.SignedString([]byte("secret"))
 }

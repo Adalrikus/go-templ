@@ -4,12 +4,12 @@ import (
   "github.com/adalrikus/go-templ/pkg/models"
 )
 
-templ Profile(user models.User) {
+templ Profile(user models.JWTCustomClaims) {
   <div>
     <h1>Profile</h1>
-    <p>First name: {{ user.FirstName }}</p>
-    <p>Last name: {{ user.LastName }}</p>
-    <p>Email: {{ user.Email }}</p>
+    <p>First name: { user.FirstName }</p>
+    <p>Last name: { user.LastName }</p>
+    <p>Email: { user.Email }</p>
   </div>
 }
 
@@ -34,7 +34,7 @@ templ Login() {
 
 templ Register() {
   <div>
-    <h1>Login</h1>
+    <h1>Register</h1>
     <form action="/register" method="POST">
       <div>
         <label for="firstname">First Name</label>
