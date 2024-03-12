@@ -1,47 +1,32 @@
 package controllers
 
 import (
-  "net/http"
-  "time"
+	"net/http"
+	"time"
 
 	"github.com/adalrikus/go-templ/pkg/auth"
 	"github.com/adalrikus/go-templ/pkg/models"
-  "github.com/adalrikus/go-templ/pkg/views/profile"
 
-  "github.com/labstack/echo/v4"
-  "github.com/golang-jwt/jwt/v5"
+	"github.com/labstack/echo/v4"
 )
 
 func RegisterNewUser(c echo.Context) error {
   var user = models.User{
     Username:  c.FormValue("username"),
     Password:  c.FormValue("password"),
-    FirstName: c.FormValue("first_name"),
-    LastName:  c.FormValue("last_name"),
+    FirstName: c.FormValue("firstname"),
+    LastName:  c.FormValue("lastname"),
     Email:     c.FormValue("email"),
   }
   if err := user.CreateNewUser(); err != nil {
     return err
   }
-  
-  var claims = auth.JWTCustomClaims{
-    user.Username,
-    user.FirstName,
-    user.LastName,
-    user.Email,
-    jwt.RegisteredClaims{
-      ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
-    },
+
+  if err := auth.GenerateTokensAndSetCookies(c, &user); err != nil {
+    return echo.NewHTTPError(http.StatusUnauthorized, "Token is incorrect")
   }
 
-  var _, err = claims.Create()
-  if err != nil {
-    return err
-  }
-  
-  c.Response().Writer.WriteHeader(http.StatusOK)
-	c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
-  return profile.Profile(claims).Render(c.Request().Context(), c.Response().Writer)
+  return c.Redirect(http.StatusMovedPermanently, "/profile")
 }
 
 func LoginUser(c echo.Context) error {
@@ -52,25 +37,27 @@ func LoginUser(c echo.Context) error {
   if err := user.Login(); err != nil {
     return err
   }
-  
-  var claims = auth.JWTCustomClaims{
-    user.Username,
-    user.FirstName,
-    user.LastName,
-    user.Email,
-    jwt.RegisteredClaims{
-      ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
-    },
+
+  if err := auth.GenerateTokensAndSetCookies(c, &user); err != nil {
+    return echo.NewHTTPError(http.StatusUnauthorized, "Token is incorrect")
   }
 
-  var _, err = claims.Create()
-  if err != nil {
-    return err
-  }
-
-  c.Response().Writer.WriteHeader(http.StatusOK)
-  c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTML)
-  return profile.Profile(claims).Render(c.Request().Context(), c.Response().Writer)
+  return c.Redirect(http.StatusMovedPermanently, "/profile")
 }
 
+func LogoutUser(c echo.Context) error {
+  expireCookie(c, auth.GetTokenKey())
+  expireCookie(c, auth.GetUserKey())
+  return c.Redirect(http.StatusMovedPermanently, "/logout")
+}
 
+func expireCookie(c echo.Context, key string) {
+  c.SetCookie(&http.Cookie{
+    Name:     key,
+    Value:    "",
+    Path:     "/",
+    HttpOnly: true,
+    Expires:  time.Unix(0, 0),
+    MaxAge:   -1,
+  })
+}

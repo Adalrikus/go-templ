@@ -1,12 +1,13 @@
 package profile
 
 import (
-  "github.com/adalrikus/go-templ/pkg/auth"
+	"github.com/adalrikus/go-templ/pkg/models"
 )
 
-templ Profile(user auth.JWTCustomClaims) {
+templ Profile(user models.User) {
   <div>
     <h1>Profile</h1>
+    <p>Username: { user.Username }</p>
     <p>First name: { user.FirstName }</p>
     <p>Last name: { user.LastName }</p>
     <p>Email: { user.Email }</p>
@@ -27,6 +28,17 @@ templ Login() {
       </div>
       <div>
         <input type="submit" value="Login"></input>
+      </div>
+    </form>
+  </div>
+}
+
+templ Logout() {
+  <div>
+    <h1>Logout</h1>
+    <form action="/logout" method="POST">
+      <div>
+        <input type="submit" value="Logout"></input>
       </div>
     </form>
   </div>

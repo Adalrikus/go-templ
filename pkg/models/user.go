@@ -3,7 +3,6 @@ package models
 import (
 	"errors"
 
-  "github.com/golang-jwt/jwt/v5"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -16,14 +15,6 @@ type User struct {
   FirstName string `gorm:"type:varchar(100)" json:"first_name"`
   LastName  string `gorm:"type:varchar(100)" json:"last_name"`
   Email     string `gorm:"type:varchar(100)" json:"email"`
-}
-
-type JWTCustomClaims struct {
-  Username  string `json:"username"`
-  FirstName string `json:"first_name"`
-  LastName  string `json:"last_name"`
-  Email     string `json:"email"`
-  jwt.RegisteredClaims
 }
 
 var DB *gorm.DB
@@ -55,7 +46,12 @@ func (u *User) Login() error {
   return nil
 }
 
-func (claims *JWTCustomClaims) Create() (string, error) {
-  var token = jwt.NewWithClaims(jwt.SigningMethodHS256, *claims)
-  return token.SignedString([]byte("secret"))
+func (u *User) Find() error {
+  var result User
+  DB.Where("Username = ?", u.Username).First(&result)
+  if result.Username != u.Username {
+    return errors.New("User not found!")
+  }
+  *u = result
+  return nil
 }
